@@ -1,3 +1,45 @@
+.env/
+.venv/
+env/
+venv/
+venv
+*.env
+
+*.pyc
+db.sqlite3
+staticfiles/
+settings.py
+.env.sample
+
+# Other files
+*.pot
+*.egg-info
+.DS_Store
+
+# IDE files
+.idea/
+
+# Cache files
+*.cache
+
+# Byte-compiled files
+*.pyc
+__pycache__/
+
+# Virtual environment
+venv/
+env/
+respay/
+respay
+# Database
+db.sqlite3
+
+# Media files
+media/
+
+# Log files
+*.log
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
