@@ -18,6 +18,7 @@ settings.py
 
 # IDE files
 .idea/
+.vscode/
 
 # Cache files
 *.cache
