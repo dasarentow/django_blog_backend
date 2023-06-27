@@ -26,7 +26,12 @@ urlpatterns = [
     path(
         "posts/<slug:slug>/comments/",
         PostViewSet.as_view({"get": "comments"}),
-        name="post-list-comments",
+        name="post-comments",
+    ),
+    path(
+        "posts/<slug:slug>/remove_comment/",
+        PostViewSet.as_view({"delete": "remove_comment"}),
+        name="post-detail-remove_comment",
     ),
     path("", include(router.urls)),
 ]

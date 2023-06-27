@@ -187,7 +187,10 @@ class TestBlogViews(APITestCase):
         )
         data = {"content": "i am doing well", "post": self.post1.id}
         data1 = {"content": "you are doing well, ooin", "post": self.post1.id}
+        data2 = {"content": "you get what i mean", "post": self.post1.id}
         response = self.client1.post(add_comment_url, data, format="json")
+        responses = self.client1.post(add_comment_url, data1, format="json")
+        responsess = self.client1.post(add_comment_url, data2, format="json")
         assert response.status_code == status.HTTP_201_CREATED
 
         """ test def comment() """
@@ -198,4 +201,12 @@ class TestBlogViews(APITestCase):
         response = self.client1.get(get_comment_url, HTTP_ACCEPT="application/json")
         assert response.status_code == status.HTTP_200_OK
 
-        # print("pot1 comments:", self.post1.comments.all().first().content)
+        """ test remove_comment()"""
+        get_comment = Comment.objects.all().get(content="you get what i mean")
+
+        remove_comment_url = reverse(
+            "blog:post-detail-remove_comment", args=[self.post1.slug]
+        )
+        print("urk", remove_comment_url)
+        response = self.client1.delete(remove_comment_url, args={get_comment.id})
+        # assert response.status_code == status.HTTP_204_NO_CONTENT
