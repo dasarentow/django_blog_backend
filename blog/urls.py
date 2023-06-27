@@ -18,6 +18,16 @@ urlpatterns = [
     path("post_api_view/", post_api_view, name="post_api_view"),
     path("post_api_view/<slug:slug>/", post_api_view, name="post_api_view"),
     path("like_and_unlike/", like_and_unlike_post, name="like_and_unlike"),
+    path(
+        "posts/<slug:slug>/add_comment/",
+        PostViewSet.as_view({"post": "add_comment"}),
+        name="post-detail-add_comment",
+    ),
+    path(
+        "posts/<slug:slug>/comments/",
+        PostViewSet.as_view({"get": "comments"}),
+        name="post-list-comments",
+    ),
     path("", include(router.urls)),
 ]
 

@@ -10,9 +10,15 @@ User = get_user_model()
 # Create your models here.
 
 
+def generate_slug(instance):
+    return instance.title.replace(" ", "-")
+
+
 def upload_to(instance, filename):
-    model_name = instance.time
-    return "{model_name}/{filename}".format(model_name=model_name, filename=filename)
+    model_name = instance.title
+    return "{model_name}/{filename}".format(
+        model_name=generate_slug(instance), filename=filename
+    )
 
 
 def generate_slug(instance):

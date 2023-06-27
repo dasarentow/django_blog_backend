@@ -263,8 +263,7 @@ class PostViewSet(ModelViewSet):
         serializer.save(author=self.request.user)
 
     def perform_update(self, serializer):
-        user = User
-        serializer.save(author=self.request.user.id)
+        serializer.save(author=self.request.user)
 
     def perform_destroy(self, instance):
         if instance.author != self.request.user:
@@ -287,7 +286,11 @@ class PostViewSet(ModelViewSet):
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=["post"])
+    @action(
+        detail=True,
+        methods=["post"],
+        # url_path="add_comment",
+    )
     def add_comment(self, request, pk=None, *args, **kwargs):
         print("heya", pk)
         data = self.request.data
