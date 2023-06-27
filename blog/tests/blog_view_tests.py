@@ -186,6 +186,7 @@ class TestBlogViews(APITestCase):
             "blog:post-detail-add_comment", kwargs={"slug": self.post1.slug}
         )
         data = {"content": "i am doing well", "post": self.post1.id}
+        data1 = {"content": "you are doing well, ooin", "post": self.post1.id}
         response = self.client1.post(add_comment_url, data, format="json")
         assert response.status_code == status.HTTP_201_CREATED
 
