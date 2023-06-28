@@ -4,6 +4,7 @@ from django.db import models
 from django.db import models
 from django.contrib.auth import get_user_model
 from autoslug import AutoSlugField
+from .utils import send_email_notification
 
 User = get_user_model()
 
@@ -112,6 +113,20 @@ class Post(models.Model):
     def get_bookmark_count(self):
         return self.bookmarks.count()
 
+    def save(self, *args, **kwargs):
+        print("sending email", self)
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        if is_new:
+            # Send email notification for new post
+            subject = "New Blog Post: {}".format(self.title)
+            recipient_list = [self.author.email]
+
+            # recipient_list = User.objects.values_list("email", flat=True)
+            template_name = "email/new_post_notification.html"
+            context = {"post": self}
+            send_email_notification(subject, recipient_list, template_name, context)
+
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
@@ -142,6 +157,18 @@ class Comment(models.Model):
 
     def get_comment_author(self):
         return self.author
+
+    def save(self, *args, **kwargs):
+        print("snow saving")
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        if is_new:
+            # Send email notification for new comment
+            subject = 'New Comment on "{}"'.format(self.post.title)
+            recipient_list = [self.post.author.email]
+            template_name = "email/new_comment_notification.html"
+            context = {"comment": self}
+            send_email_notification(subject, recipient_list, template_name, context)
 
 
 class Like(models.Model):
@@ -239,7 +266,7 @@ class Reply(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Reply by {self.author.username} on {self.comment.post.title}"
+        return f"Reply by {self.author.username} on {self.comment.content} under {self.comment.post.title}"
 
     def get_reply_author(self):
         return self.author

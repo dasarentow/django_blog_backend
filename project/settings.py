@@ -88,7 +88,11 @@ ROOT_URLCONF = "project.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "project/templates"],
+        "DIRS": [
+            BASE_DIR / "project/templates",
+            "blog/templates",
+            "blog/templates/email",
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -113,6 +117,35 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+
+# settings.py
+
+# SMTP email backend settings
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"  # SMTP server address
+EMAIL_PORT = 587  # SMTP server port
+# Use TLS encryption for SMTP
+EMAIL_HOST_USER = "dsappapp@gmail.com"  # SMTP username
+EMAIL_HOST_PASSWORD = "qdurjeqiappanpky"  # SMTP password
+EMAIL_USE_SSL = False
+EMAIL_USE_TLS = True
+
+# Default email address to use for various automated notifications
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # Default email address
+
+# Alternatively, you can use other email backends such as console or file-based backend for testing/development purposes.
+# For example, to use the console backend:
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# For file-based backend:
+# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+# EMAIL_FILE_PATH = '/path/to/your/file'  # Specify the file path to save emails
+
+# Additional email settings
+# EMAIL_SUBJECT_PREFIX = '[Your Project Name]'  # Prefix added to email subjects
+# EMAIL_TIMEOUT = None  # Timeout value for email sending
+# EMAIL_USE_SSL = False  # Use SSL encryption for SMTP
 
 
 # Password validation

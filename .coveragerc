@@ -9,7 +9,7 @@ omit =
    *manage.py
    */settings.py
    */github_settings.py
-   */tests/*
+    //  * /tests/*
    *apps.py
    *migrations/*
    */migrations/*

@@ -4,6 +4,7 @@ from myusers.serializers import *
 from .models import *
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from myusers.serializers import UserPublicSerializer
+from rest_framework import viewsets, permissions
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -58,6 +59,27 @@ class CommentSerializer(serializers.ModelSerializer):
             "timestamp",
             "slug",
         )
+
+    # def create(self, request, *args, **kwargs):
+    #     if request.user.is_authenticated:
+    #         user = request.user
+    #         request.data['user'] = user.id
+    #     else:
+    #         user = None
+    #         request.data['user'] = None
+
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+
+    #     if user:
+    #         serializer.validated_data['name'] = user.username
+    #     else:
+    #         serializer.validated_data['name'] = 'Anonymous'
+
+    #     self.perform_create(serializer)
+
+    #     headers = self.get_success_headers(serializer.data)
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     # def create(self, validated_data):
     #     post_data = validated_data.pop("post")  # Extract the nested post data

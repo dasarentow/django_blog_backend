@@ -20,6 +20,15 @@ from django.core.exceptions import PermissionDenied
 from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 from django.http import Http404
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.filters import SearchFilter
+from rest_framework.filters import OrderingFilter
+
+
+class BlogPostPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 100
 
 
 class CategoryViewSet(ModelViewSet):
@@ -107,6 +116,7 @@ class NotificationViewSet(ModelViewSet):
 class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    http_method_names = ["get", "post", "delete"]
 
     def perform_create(self, serializer, *args, **kwargs):
         data = self.request.data
@@ -118,16 +128,31 @@ class CommentViewSet(ModelViewSet):
         # get_post = Post.objects.filter(title=post_id).first()
         serializer.save(author=self.request.user, post=get_post, content=content)
 
-    def perform_update(self, serializer):
-        author = self.request.user
-        serializer.save(author=self.request.user)
+    from rest_framework import viewsets, permissions
 
 
-class PostViewSet(ModelViewSet):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-    lookup_field = "slug"
-    parser_classes = (MultiPartParser, FormParser)
+# class CommentViewSet(viewsets.ModelViewSet):
+#     # ...
+
+#     # def create(self, request, *args, **kwargs):
+#     #     if request.user.is_authenticated:
+#     #         user = request.user
+#     #         request.data['user'] = user.id
+#     #         request.data['name'] = user.username
+#     #     else:
+#     #         user = None
+#     #         request.data['user'] = None
+#     #         request.data['name'] = 'Anonymous'
+
+#     #     return super().create(request, *args, **kwargs)
+
+#     def perform_update(self, serializer):
+#         author = self.request.user
+#         serializer.save(author=self.request.user)
+
+# queryset = Post.objects.all()
+# serializer_class = PostSerializer
+# lookup_field = "slug"
 
 
 class LikeViewSet(ModelViewSet):
@@ -255,8 +280,12 @@ class BookmarkViewSet(ModelViewSet):
 
 
 class PostViewSet(ModelViewSet):
+    parser_classes = (MultiPartParser, FormParser)
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    pagination_class = BlogPostPagination
+    search_fields = ["title", "content", "category__name"]
+    ordering_fields = ["publication_date", "views"]
     lookup_field = "slug"
 
     def perform_create(self, serializer):
@@ -302,13 +331,13 @@ class PostViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=["delete"])
-    def remove_comment(self, request, pk=None):
+    @action(detail=True, methods=["delete"], url_path="comments/(?P<comment_id>[^/.]+)")
+    def delete_comment(self, request, pk=None):
         post = self.get_object()
         user = self.request.user
 
         # Retrieve the comment to be removed
-        comment_id = request.data.get("comment_id")
+        comment_id = pk  # Assuming the comment ID is passed as `pk`
         comment = post.comments.filter(id=comment_id).first()
 
         if not comment:
@@ -316,7 +345,7 @@ class PostViewSet(ModelViewSet):
                 {"detail": "Comment not found."}, status=status.HTTP_404_NOT_FOUND
             )
 
-        # Check if the user is the author of the comment
+        # Check if the user is the author of the comment or has sufficient permissions
         if comment.author != user:
             raise PermissionDenied("You don't have permission to remove this comment.")
 
@@ -328,7 +357,7 @@ class PostViewSet(ModelViewSet):
         )
 
     @action(detail=True, methods=["post"])
-    def bookmark(self, request, pk=None):
+    def bookmark(self, request, slug=None):
         post = self.get_object()
         user = request.user
 
@@ -347,7 +376,7 @@ class PostViewSet(ModelViewSet):
         )
 
     @action(detail=True, methods=["delete"])
-    def remove_bookmark(self, request, pk=None):
+    def remove_bookmark(self, request, slug=None):
         post = self.get_object()
         user = request.user
 
@@ -369,13 +398,13 @@ class PostViewSet(ModelViewSet):
     # Additional actions
 
     @action(detail=True, methods=["get"])
-    def likes(self, request, pk=None):
+    def likes(self, request, slug=None):
         post = self.get_object()
         likes = post.likes.all()
         serializer = LikeSerializer(likes, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=["post"], url_path="add-like-unlike")
     def add_like_unlike(self, request, slug=None):
         post = self.get_object()
         user = request.user
@@ -393,7 +422,10 @@ class PostViewSet(ModelViewSet):
         like = Like(post=post, user=user)
         like.save()
         return Response(
-            {"detail": "Post liked successfully."},
+            {
+                "detail": "Post liked successfully.",
+            },
+            status=status.HTTP_200_OK,
         )
 
     @action(detail=True, methods=["delete"])
@@ -461,7 +493,10 @@ def like_and_unlike_post(request, *args, **kwargs):
         else:
             like = Like.objects.create(user=request.user, post=get_post)
             serializer = LikeSerializer(like)
-            return Response(serializer.data, status=201)
+            return Response(
+                {"detail": "You successfully liked the post.", "data": serializer.data},
+                status=status.HTTP_200_OK,
+            )
 
 
 class NotificationViewSet(ModelViewSet):
@@ -553,6 +588,7 @@ class ReplyViewSet(ModelViewSet):
         content = data.get("content")
         get_comment = get_object_or_404(Comment, id=comment)
         serializer.save(author=user, content=content, comment=get_comment)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()

@@ -141,13 +141,17 @@ class TestBlogViews(APITestCase):
             "content": "this is the content",
             "title": "na title this",
         }
-        create_post = self.client1.post(create_post_url, data, format="json")
+        create_post = self.client1.post(
+            create_post_url, data, content="application/json"
+        )
 
         assert create_post.status_code == status.HTTP_201_CREATED
         assert create_post.data["author"]["username"] == "user1"
 
         """test perform_update"""
-        update_post = self.client1.put(update_post_url, data1, format="json")
+        update_post = self.client1.put(
+            update_post_url, data1, content="application/json"
+        )
         assert update_post.status_code == status.HTTP_200_OK
         assert update_post.data["author"]["username"] == "user1"
 
@@ -188,9 +192,9 @@ class TestBlogViews(APITestCase):
         data = {"content": "i am doing well", "post": self.post1.id}
         data1 = {"content": "you are doing well, ooin", "post": self.post1.id}
         data2 = {"content": "you get what i mean", "post": self.post1.id}
-        response = self.client1.post(add_comment_url, data, format="json")
-        responses = self.client1.post(add_comment_url, data1, format="json")
-        responsess = self.client1.post(add_comment_url, data2, format="json")
+        response = self.client1.post(add_comment_url, data, format="multipart")
+        responses = self.client1.post(add_comment_url, data1, format="multipart")
+        responsess = self.client1.post(add_comment_url, data2, format="multipart")
         assert response.status_code == status.HTTP_201_CREATED
 
         """ test def comment() """
@@ -198,15 +202,115 @@ class TestBlogViews(APITestCase):
         get_comment_url = reverse(
             "blog:post-comments", kwargs={"slug": self.post1.slug}
         )
-        response = self.client1.get(get_comment_url, HTTP_ACCEPT="application/json")
+        # response = self.client1.get(get_comment_url, HTTP_ACCEPT="application/json")
+        response = self.client1.get(
+            get_comment_url,
+        )
         assert response.status_code == status.HTTP_200_OK
 
         """ test remove_comment()"""
         get_comment = Comment.objects.all().get(content="you get what i mean")
 
-        remove_comment_url = reverse(
-            "blog:post-detail-remove_comment", args=[self.post1.slug]
-        )
-        print("urk", remove_comment_url)
-        response = self.client1.delete(remove_comment_url, args={get_comment.id})
+        # remove_comment_url = reverse(
+        #     "blog:post-detail-remove_comment", args=[self.post1.slug]
+        # )
+
+        # response = self.client1.delete(remove_comment_url, args={get_comment.id})
         # assert response.status_code == status.HTTP_204_NO_CONTENT
+
+        """ test def bookmark in PostViewSet """
+        bookmark_url = reverse("blog:post-bookmark", kwargs={"slug": self.post1.slug})
+
+        data = {
+            "post": self.post1.id,
+        }
+
+        bookmark = self.client1.post(bookmark_url, data, format="json")
+        assert bookmark.data["detail"] == "Post bookmarked successfully."
+        assert bookmark.status_code == status.HTTP_201_CREATED
+        bookmarks = self.client1.post(bookmark_url, data, format="json")
+        assert bookmarks.data["detail"] == "Post is already bookmarked."
+        assert bookmarks.status_code == status.HTTP_400_BAD_REQUEST
+
+        """ test def remove_bookmark in PostViewSet """
+        remove_bookmark_url = reverse(
+            "blog:post-remove_bookmark", kwargs={"slug": self.post1.slug}
+        )
+        client2 = APIClient()
+        client2.force_authenticate(user=self.user2)
+        remove = client2.delete(remove_bookmark_url)
+        assert remove.data["detail"] == "Post is not bookmarked by the user."
+        result = self.client1.delete(remove_bookmark_url)
+        assert result.status_code == status.HTTP_204_NO_CONTENT
+
+        """ test def likes() on PostViewSet"""
+        likes_url = reverse("blog:post-likes", kwargs={"slug": self.post1.slug})
+
+        response = self.client1.get(likes_url)
+        assert response.status_code == status.HTTP_200_OK
+
+        """ test def add_like_unlike() in PostViewSet"""
+        add_like_unlike_url = reverse(
+            "blog:post-add_like_unlike", kwargs={"slug": self.post1.slug}
+        )
+        data = {"post": self.post1.id}
+        response = self.client1.post(add_like_unlike_url, data, format="json")
+        assert response.data["detail"] == "Post liked successfully."
+        assert response.status_code == status.HTTP_200_OK
+        responses = self.client1.post(add_like_unlike_url, data, format="json")
+        assert responses.data["detail"] == "Post unliked."
+        assert responses.status_code == status.HTTP_200_OK
+
+    def test_api_view(self):
+        url = reverse("blog:post_api_view")
+        response = self.client1.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        url = reverse("blog:post_api_view", args=[self.post1.slug])
+        response = self.client1.get(url)
+
+        assert response.data["views"] == 1
+
+    def test_like_and_unlike_post(self):
+        data = {
+            "post": self.post1.id,
+        }
+        url = reverse("blog:like_and_unlike")
+        response = self.client1.get(url)
+        assert response.status_code == status.HTTP_200_OK
+
+        """test put method to like and line"""
+        url = reverse("blog:like_and_unlike", args={self.post1.slug})
+        like = self.client1.put(url, data, format="json")
+        assert like.status_code == status.HTTP_200_OK
+        assert like.data["detail"] == "You successfully liked the post."
+
+        unlike = self.client1.put(url, data, format="json")
+        assert unlike.status_code == status.HTTP_200_OK
+        assert unlike.data["detail"] == "Post unliked successfully."
+
+    def test_reply_viewset(self):
+        author = self.user1
+        post = self.post1.id
+        comment = mixer.blend(
+            Comment,
+            author=self.user1,
+            post=self.post2,
+            content="this is the content for this mixer.blend Comment",
+        )
+        print("comment: ", comment.id)
+
+        add_comment_url = reverse("blog:comment-list")
+        print("reverse", add_comment_url)
+        data = {"content": "God still speaks", "post": self.post1.id}
+
+        response = self.client1.post(add_comment_url, data, format="json")
+        assert response.status_code == status.HTTP_201_CREATED
+
+        reply_url = reverse("blog:reply-list")
+        data = {"comment": comment.id, "content": "this is the reply to ${comment.id}"}
+        response = self.client1.post(reply_url, data, format="json")
+        assert response.status_code == status.HTTP_201_CREATED
+
+        assert comment.replies.all().count() == 1

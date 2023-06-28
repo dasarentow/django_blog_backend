@@ -101,6 +101,7 @@ urlpatterns = [
     ),
     # apps
     path("drf-swagger", schema_view),
+    path("swagger", schema_view),
     # vjv
     re_path(
         r"^swagger(?P<format>\.json|\.yaml)$",

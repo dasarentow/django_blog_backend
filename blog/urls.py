@@ -18,6 +18,7 @@ urlpatterns = [
     path("post_api_view/", post_api_view, name="post_api_view"),
     path("post_api_view/<slug:slug>/", post_api_view, name="post_api_view"),
     path("like_and_unlike/", like_and_unlike_post, name="like_and_unlike"),
+    path("like_and_unlike/<slug:slug>/", like_and_unlike_post, name="like_and_unlike"),
     path(
         "posts/<slug:slug>/add_comment/",
         PostViewSet.as_view({"post": "add_comment"}),
@@ -29,9 +30,19 @@ urlpatterns = [
         name="post-comments",
     ),
     path(
-        "posts/<slug:slug>/remove_comment/",
-        PostViewSet.as_view({"delete": "remove_comment"}),
-        name="post-detail-remove_comment",
+        "posts/<slug:slug>/bookmark/",
+        PostViewSet.as_view({"post": "bookmark"}),
+        name="post-bookmark",
+    ),
+    path(
+        "posts/<slug:slug>/remove-bookmark/",
+        PostViewSet.as_view({"delete": "remove_bookmark"}),
+        name="post-remove_bookmark",
+    ),
+    path(
+        "posts/<slug:slug>/add_like_unlike/",
+        PostViewSet.as_view({"post": "add_like_unlike"}),
+        name="post-add_like_unlike",
     ),
     path("", include(router.urls)),
 ]
