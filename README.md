@@ -1,9 +1,12 @@
-![GitHub Workflow Status]https://github.com/dasarentow/django_blog_backend/blob/main/.github/workflows/blog.yml
+[![GitHub Workflow Status](https://github.com/dasarentow/django_blog_backend/actions/workflows/blog.yml/badge.svg)](https://github.com/dasarentow/django_blog_backend/actions/workflows/blog.yml)
 ![](https://github.com/dasarentow/django_blog_backend/actions/workflows/blog.yml/badge.svg)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/your-dasarentow/django_blog_backend/CI)](https://github.com/dasarentow/django_blog_backend/actions)
 [![Codecov](https://img.shields.io/codecov/c/github/dasarentow/django_blog_backend)](https://codecov.io/gh/dasarentow/django_blog_backend)
 [![Requirements Status](https://img.shields.io/requires/github/dasarentow/django_blog_backend)](requirements.txt)
+
+
+
 
 # django_blog_backend
 
