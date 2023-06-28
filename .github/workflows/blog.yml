@@ -30,6 +30,7 @@ jobs:
           EMAIL_HOST_USER: ${{secrets.EMAIL_HOST_USER}}
           EMAIL_HOST_PASSWORD: ${{secrets.EMAIL_HOST_PASSWORD}}
           DJANGO_SETTINGS_MODULE: ${{secrets.DJANGO_SETTINGS_MODULE}}
+          CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
 
           options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
@@ -46,3 +47,8 @@ jobs:
       - name: Run Tests
         run: |
           pytest --ds=project.github_settings -v --nomigrations
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
