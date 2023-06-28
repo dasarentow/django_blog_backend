@@ -4,7 +4,7 @@
 ![](https://github.com/dasarentow/django_blog_backend/actions/workflows/blog.yml/badge.svg)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/your-dasarentow/django_blog_backend/CI)](https://github.com/dasarentow/django_blog_backend/actions)
-[![Codecov](https://img.shields.io/codecov/c/github/dasarentow/django_blog_backend)](https://app.codecov.io/gh/dasarentow/django_blog_backend)
+[![codecov](https://img.shields.io/codecov/c/github/dasarentow/django_blog_backend)](https://app.codecov.io/gh/dasarentow/django_blog_backend)
 [![codecov](https://codecov.io/gh/dasarentow/django_blog_backend/branch/main/graph/badge.svg?token=eIIsBhm7OB)](https://codecov.io/gh/dasarentow/django_blog_backend)
 
 
