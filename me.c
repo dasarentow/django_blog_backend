@@ -1,0 +1,1 @@
+// pytest --ds=project.github_settings -v --nomigrations
