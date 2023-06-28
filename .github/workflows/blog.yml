@@ -27,10 +27,10 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
           POSTGRES_DB: ${{secrets.DATABASE_NAME}}
-          EMAIL_HOST_PASSWORD: ${{secrets.EMAIL_HOST_PASSWORD}}
-          EMAIL_HOST_USER: ${{secrets.EMAIL_HOST_USER}}
-          DJANGO_SETTINGS_MODULE: ${{secrets.DJANGO_SETTINGS_MODULE}}
-          CODECOV_TOKEN: ${{secrets.CODECOV_TOKEN}}
+          EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
+          EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+          DJANGO_SETTINGS_MODULE: ${{ secrets.DJANGO_SETTINGS_MODULE }}
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
           options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
