@@ -1,4 +1,5 @@
 import math
+import pprint
 import random
 from django.db.models import Max
 from django.db.models import Q
@@ -301,12 +302,39 @@ class PostViewSet(ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.views += 2  # Increment the views parameter
+        instance.views += 1  # Increment the views parameter
         instance.save()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
     # Existing actions
+    @action(detail=False, methods=["get"])
+    def popular_posts(self, request):
+        num_posts = 5
+        popular_posts = Post.get_popular_posts(num_posts=num_posts)
+        serializer = self.get_serializer(popular_posts, many=True)
+        return Response(serializer.data)
+
+    #  @action(detail=False, methods=["get"])
+    # def unread_notifications_count(self, request):
+    #     count = (
+    #         self.get_queryset().filter(recipient=request.user, is_read=False).count()
+    #     )
+    #     return Response({"count": count})
+
+    @action(detail=False, methods=["get"])
+    def editors_pick(self, request):
+        num_posts = 5
+        editors_pick = Post.get_editors_pick(num_posts=num_posts)
+        serializer = self.get_serializer(editors_pick, many=True)
+        return Response(serializer.data)
+
+    # @action(detail=False, methods=["get"])
+    # def editors_pick(self, request):
+    #     num_posts = 5
+    #     editors_pick = self.get_queryset().filter(is_editors_pick=True)
+    #     serializer = self.get_serializer(editors_pick, many=True)
+    #     return Response(serializer.data)
 
     @action(detail=True, methods=["get"])
     def comments(self, request, pk=None, slug=None):

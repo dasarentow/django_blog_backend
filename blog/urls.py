@@ -44,6 +44,16 @@ urlpatterns = [
         PostViewSet.as_view({"post": "add_like_unlike"}),
         name="post-add_like_unlike",
     ),
+    path(
+        "popular-posts/",
+        PostViewSet.as_view({"get": "popular_posts"}),
+        name="popular_posts",
+    ),
+    path(
+        "editors-pick/",
+        PostViewSet.as_view({"get": "editors_pick"}),
+        name="editors_pick",
+    ),
     path("", include(router.urls)),
 ]
 
