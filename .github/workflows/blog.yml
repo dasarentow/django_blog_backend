@@ -15,7 +15,8 @@ jobs:
       DATABASE_NAME: ${{secrets.DATABASE_NAME}}
       EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
       EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
-      DJANGO_SETTINGS_MODULE: ${{ secrets.DJANGO_SETTINGS_MODULE }}
+      # DJANGO_SETTINGS_MODULE: ${{ secrets.DJANGO_SETTINGS_MODULE }}
+      DJANGO_SETTINGS_MODULE: project.github_settings
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     strategy:
