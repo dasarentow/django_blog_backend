@@ -56,6 +56,12 @@ class BookmarkAdmin(admin.ModelAdmin):
 class PostAdmin(admin.ModelAdmin):
     list_display = [x.name for x in Post._meta.fields]
 
+    def get_readonly_fields(self, request, obj=None):
+        # Make 'is_editors_pick' field readonly for non-superusers
+        if not request.user.is_superuser:
+            return ("is_editors_pick",)
+        return ()
+
 
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Tag, TagAdmin)

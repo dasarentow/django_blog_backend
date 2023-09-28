@@ -89,6 +89,7 @@ class Post(models.Model):
         default="draft",
     )
     views = models.PositiveIntegerField(default=0)
+    is_editors_pick = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
@@ -100,6 +101,10 @@ class Post(models.Model):
     @staticmethod
     def get_popular_posts(num_posts=5):
         return Post.objects.order_by("-views")[:num_posts]
+
+    @staticmethod
+    def get_editors_pick(num_posts=5):
+        return Post.objects.filter(is_editors_pick=True)[:num_posts]
 
     def get_recent_comments(self, num_comments=5):
         return self.comments.order_by("-timestamp")[:num_comments]

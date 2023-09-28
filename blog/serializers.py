@@ -38,6 +38,7 @@ class PostSerializer(serializers.ModelSerializer):
             "image",
             "status",
             "views",
+            "is_editors_pick",
         ]
         read_only_fields = ("views", "publication_date", "slug", "author")
 
