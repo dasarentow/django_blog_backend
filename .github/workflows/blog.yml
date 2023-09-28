@@ -41,6 +41,8 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Set DJANGO_SETTINGS_MODULE
+        run: echo "export DJANGO_SETTINGS_MODULE=project.github_settings" >> $GITHUB_ENV
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
